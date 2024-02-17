@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
     const cellSize = canvas.width / gridSize; // Caclulate cell size
 
     let ships = []; // Ship placement on player's board
-    let enemyShips = [[2, 2], [3, 3]]; // Enemy ships placement
+    let enemyShips = [[2, 2], [7, 7], [4, 9]]; // Enemy ships placement
     let hits = []; // Array totrack ship hits
     let hitCount = 0; // Track hit count
     let missCount = 0; //Track miss count
@@ -64,6 +64,8 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
         const gridX = Math.floor(x / cellSize);
         const gridY = Math.floor(y / cellSize);
 
+        
+
         if (!ships.some(ship => ship[0] === gridX && ship[1] === gridY)) { // Check if cell is occupied by ship
             ships.push([gridX, gridY]); // Add ship position to ships array
             drawBoard(); // Redraw board to include added ships
@@ -75,6 +77,11 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
             pickUpShipButton.classList.add('btn-secondary');
         } else {
             alert("You already placed a ship here!"); // If cell is occupied, alert the user a ship has already been placed there
+        }
+        if (ships.length == 3) {
+            pickUpShipButton.remove();
+            alert("You may begin attacking!")
+            return;
         }
     }
 
