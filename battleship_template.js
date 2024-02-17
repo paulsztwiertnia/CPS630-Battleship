@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         location.reload(); 
     });
 
+
     function drawBoard() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < gridSize; i++) {
@@ -41,6 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const y = event.clientY - rect.top;
         const gridX = Math.floor(x / cellSize);
         const gridY = Math.floor(y / cellSize);
+
+        if (hits.some(hit => hit[0] === gridX && hit[1] === gridY)) {
+            alert("You already bombed this square, pick a different one!");
+            return; 
+        }
 
         if (!hits.some(hit => hit[0] === gridX && hit[1] === gridY)) {
             if (ships.some(ship => ship[0] === gridX && ship[1] === gridY)) {
