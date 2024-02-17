@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() { // Const variables to set up canvas and load them
+document.addEventListener('DOMContentLoaded', function() { 
+    // Set up canvas and load it
     const canvas = document.getElementById('playerCanvas');
     const canvasEnemy = document.getElementById('enemyCanvas');
     const ctx = canvas.getContext('2d');
@@ -8,9 +9,11 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
 
     let ships = []; // Ship placement on player's board
     let enemyShips = [[2, 2], [7, 7], [4, 9]]; // Enemy ships placement
-    let hits = []; // Array totrack ship hits
+    let hits = []; // Array to track ship hits
+    let cpuHits = []; // Array to track ship hits
+    let cpuSankShip = 0;
     let hitCount = 0; // Track hit count
-    let missCount = 0; //Track miss count
+    let missCount = 0; // Track miss count
     
     let shipToPlace = false; // Flag for ship placement
     let gameOver = false; // Flag to prevent bombing once game is over
@@ -86,9 +89,9 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
     }
 
     // logic function to make sure ships are placed before attacking 
-    function handleAttack(event) {
+    function playerAttack(event) {
         if (gameOver) { // If gameOver flag is true, alert the user to start a new game
-            alert("Game is over. Please start a new game."); 
+            alert("Game Over, Start a new game."); 
             return; 
         }
 
@@ -116,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
             hitCount++; // Increment hit count, make cell red if a ship is hit
             if (hitCount === enemyShips.length) {
                 alert('Game Over, You Win!');
-                gameOver = true; // Update the game state to indicate the game has ended
+                gameOver = true; // Update the game state flag
                 pickUpShipButton.classList.add('disabled'); // Disable button to place ships once game is ended
             }
         } else {
@@ -126,6 +129,36 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
         ctxEnemy.fillRect(gridX * cellSize, gridY * cellSize, cellSize, cellSize);
         document.getElementById('hitCount').textContent = hitCount; // Update hit count
         document.getElementById('missCount').textContent = missCount; // Update miss count
+        
+        enemyAttack(); // Call enemy attack function after players turn is done
+    }
+
+    function enemyAttack() {
+        if (cpuSankShip == 3) { // If CPU sanks all 3 players ships, alert the user, start a new game
+            alert("Game over, CPU wins!");
+            location.reload(); 
+        }
+    
+        let attackX = Math.floor(Math.random() * gridSize); // Random X coordinate for CPU attack
+        let attackY = Math.floor(Math.random() * gridSize); // Random Y coordinate for CPU attack
+        // Check if coordinates have already been attacked by CPU
+        if (cpuHits.some(hit => hit[0] === attackX && hit[1] === attackY)) {
+            enemyAttack(); // If coordinates have been attacked, call function again
+            return;
+        }
+    
+        let isHit = ships.some(ship => ship[0] === attackX && ship[1] === attackY); // Check coordinates of enemy attack, set it to true if attack was successful
+    
+        if (isHit) {
+            ctx.fillStyle = 'red'; // Color the square red if CPU hit
+            ctx.fillRect(attackX * cellSize, attackY * cellSize, cellSize, cellSize);
+            cpuSankShip++; // Increment array to keep track of sunken player ships
+        } else {
+            ctx.fillStyle = 'grey'; // Color the square grey if CPU missed
+            ctx.fillRect(attackX * cellSize, attackY * cellSize, cellSize, cellSize);
+
+        }
+        cpuHits.push([attackX, attackY]); // Add previous attack coordinates to cpuHits array
     }
 
     // function to initialize start of game
@@ -133,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() { // Const variables to
         drawBoard();
         drawEnemyBoard();
         canvas.addEventListener('click', placeShip);
-        canvasEnemy.addEventListener('click', handleAttack);
+        canvasEnemy.addEventListener('click', playerAttack);
     }
     
     initGame(); //call the function to start the game
