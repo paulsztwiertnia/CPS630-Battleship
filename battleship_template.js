@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = canvas.getContext('2d');
     const ctxEnemy = canvasEnemy.getContext('2d');
     const gridSize = 10;
-    const cellSize = canvas.width / gridSize; // Caclulate cell size
+    const cellSize = canvas.width / gridSize; // Caclulate cell size  
 
     let ships = []; // Ship placement on player's board
     let enemyShips = [[2, 2], [7, 7], [4, 9]]; // Enemy ships placement
@@ -60,35 +60,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to place ships
     function placeShip(event) {
-        if (!shipToPlace) return; // If shipToPlace flag is false, user is unable to place ships
+        if (!shipToPlace) {
+            return; // If shipToPlace flag is false, user is unable to place ships
+        }
+    
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         const gridX = Math.floor(x / cellSize);
         const gridY = Math.floor(y / cellSize);
 
-        
-
         if (!ships.some(ship => ship[0] === gridX && ship[1] === gridY)) { // Check if cell is occupied by ship
             ships.push([gridX, gridY]); // Add ship position to ships array
             drawBoard(); // Redraw board to include added ships
-            shipToPlace = false; // set flag to show user has stopped placing ships
+            shipToPlace = false; // Set flag to show user has stopped placing ships
 
-            // Change color of buttons to show state of Pick Up Ship button
+            // Change color of buttons and show state of Pick Up Ship button
             pickUpShipButton.textContent = 'Pick Up Ship';
             pickUpShipButton.classList.remove('btn-warning');
             pickUpShipButton.classList.add('btn-secondary');
         } else {
             alert("You already placed a ship here!"); // If cell is occupied, alert the user a ship has already been placed there
         }
-        if (ships.length == 3) {
-            pickUpShipButton.remove();
+        if (ships.length == 3) { // If user has placed 3 ships they can begin attacking the CPU board
+            pickUpShipButton.remove(); // Remove button so user can't place anymore ships
             alert("You may begin attacking!")
             return;
         }
     }
 
-    // logic function to make sure ships are placed before attacking 
     function playerAttack(event) {
         if (gameOver) { // If gameOver flag is true, alert the user to start a new game
             alert("Game Over, Start a new game."); 
@@ -101,13 +101,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const rect = canvasEnemy.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const gridX = Math.floor(x / cellSize);
-        const gridY = Math.floor(y / cellSize);
+        const x = event.clientX - rect.left; // Calculation for x coordinate
+        const y = event.clientY - rect.top; // Calculation for y coordinate
+        const gridX = Math.floor(x / cellSize); // Calculation for grid X coordinate
+        const gridY = Math.floor(y / cellSize); // Calculation for grid Y coordinate
 
-        // logic to check if square has already been attacked
-        if (hits.some(hit => hit[0] === gridX && hit[1] === gridY)) {
+        if (hits.some(hit => hit[0] === gridX && hit[1] === gridY)) {  // logic to check if square has already been attacked
             alert("You already attacked this square, pick a different one!");
             return;
         }
@@ -124,9 +123,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             ctxEnemy.fillStyle = 'grey'; // If coordinates of attack do not represent a ship, make the square grey and increment missCount by 1
-            missCount++;
+            missCount++; 
         }
-        ctxEnemy.fillRect(gridX * cellSize, gridY * cellSize, cellSize, cellSize);
+        
+        ctxEnemy.fillRect(gridX * cellSize, gridY * cellSize, cellSize, cellSize); // Show the players attack on the enemy board
         document.getElementById('hitCount').textContent = hitCount; // Update hit count
         document.getElementById('missCount').textContent = missCount; // Update miss count
         
